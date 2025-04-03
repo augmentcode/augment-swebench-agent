@@ -1,0 +1,31 @@
+# Ignore sensitive files and directories
+.env
+*.pem
+*.key
+*.crt
+*.cert
+
+# Ignore log files and debug information
+*.log
+*.debug
+
+# Ignore database and configuration files
+*.sqlite
+*.db
+*.config
+*.ini
+
+# Ignore compiled files and packages
+/node_modules
+/vendor
+*.pyc
+*.class
+
+# Ignore IDE and editor files
+/.idea/
+/.vscode/
+/*.swp
+
+# Ignore operating system files
+.DS_Store
+Thumbs.db
