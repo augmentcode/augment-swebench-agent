@@ -122,12 +122,12 @@ You can increase `--num-examples` and `--num-candidate-solutions` to run on more
 
 There are 500 examples total in SWE-bench Verified. Note that this can take awhile, so there are a few levels of parallelism this repository supports.
 - Firstly, we suggest running 8 processes. This is the `--num-processes` flag. Beyond this, Docker hits issues.
-- Secondly, we support a notion of breaking up the dataset into shards. This is the `--shard-ct` and `--shard-id` flags. This makes it relatively easy to split up the work across multiple machines, which circumnvents the issues with scaling Docker byeond 8 processes.
+- Secondly, we support a notion of breaking up the dataset into shards. This is the `--shard-ct` and `--shard-id` flags. This makes it relatively easy to split up the work across multiple machines, which circumnvents the issues with scaling Docker beyond 8 processes.
 
 In our experiments, it took us a couple hours to run the full evaluation for 1 candidate solution per problem. This was
 with 10 shards split out across separate pods (managed by Kubernetes) and each pod had 8 processes.
 
-Keep in mind that you hit may hit rate-limits from Anthropic running 80 agents in parallel like we did. We have very high rate-limits with Anthropic's API that you may not have. Given this, you may have to run with a smaller `--shard-ct` and/or `--num-processes`.
+Keep in mind that you may hit rate-limits from Anthropic running 80 agents in parallel like we did. We have very high rate-limits with Anthropic's API that you may not have. Given this, you may have to run with a smaller `--shard-ct` and/or `--num-processes`.
 
 Suppose you want to run with 10 shards and 8 processes per shard, then that would mean you run the following command 10 times, varying the `--shard-id` flag from 0 to 9, on 10 different machines:
 ```bash
