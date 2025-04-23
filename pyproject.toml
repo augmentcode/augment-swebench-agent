@@ -26,6 +26,12 @@ dependencies = [
     "termcolor>=2.5.0",
 ]
 
+[tool.setuptools]
+packages = ["swebench_system", "tools", "utils", "prompts"]
+
+[project.scripts]
+agent-cli = "swebench_system.cli:main"
+
 [dependency-groups]
 dev = [
     "ruff>=0.11.2",

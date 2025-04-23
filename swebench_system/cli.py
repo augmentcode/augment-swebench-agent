@@ -17,6 +17,11 @@ from rich.panel import Panel
 from prompt_toolkit import prompt
 from prompt_toolkit.history import InMemoryHistory
 
+import sys
+import os
+# Add the parent directory to sys.path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from tools.agent import Agent
 from utils.workspace_manager import WorkspaceManager
 from utils.llm_client import get_client
