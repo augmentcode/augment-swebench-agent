@@ -400,10 +400,14 @@ class OpenAIDirectClient(LLMClient):
     def __init__(self, model_name: str, max_retries=2, cot_model: bool = True):
         """Initialize the OpenAI first party client."""
         api_key = os.getenv("OPENAI_API_KEY")
-        self.client = openai.OpenAI(
-            api_key=api_key,
-            max_retries=1,
-        )
+        base_url = os.getenv("OPENAI_BASE_URL")
+        
+        # Initialize the client with optional base_url if provided
+        client_kwargs = {"api_key": api_key, "max_retries": 1}
+        if base_url:
+            client_kwargs["base_url"] = base_url
+            
+        self.client = openai.OpenAI(**client_kwargs)
         self.model_name = model_name
         self.max_retries = max_retries
         self.cot_model = cot_model
@@ -454,12 +458,18 @@ class OpenAIDirectClient(LLMClient):
                 openai_message = {"role": "assistant", "content": [message_content]}
             elif str(type(augment_message)) == str(ToolCall):
                 augment_message = cast(ToolCall, augment_message)
+                # Ensure arguments are always a JSON string, not an object
+                if isinstance(augment_message.tool_input, (dict, list)):
+                    tool_input_str = json.dumps(augment_message.tool_input)
+                else:
+                    tool_input_str = str(augment_message.tool_input)
+                
                 tool_call = {
                     "type": "function",
                     "id": augment_message.tool_call_id,
                     "function": {
                         "name": augment_message.tool_name,
-                        "arguments": augment_message.tool_input,
+                        "arguments": tool_input_str,
                     },
                 }
                 openai_message = {

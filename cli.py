@@ -73,6 +73,18 @@ def main():
         action="store_true",
         default=False,
     )
+    parser.add_argument(
+        "--openai-base-url",
+        type=str,
+        default=None,
+        help="(Optional) Base URL for OpenAI API. Used when ANTHROPIC_API_KEY is not set.",
+    )
+    parser.add_argument(
+        "--openai-model",
+        type=str,
+        default="gpt-4-turbo",
+        help="(Optional) OpenAI model to use when ANTHROPIC_API_KEY is not set.",
+    )
 
     args = parser.parse_args()
 
@@ -86,11 +98,31 @@ def main():
     else:
         logger_for_agent_logs.propagate = False
 
+    # Set OpenAI base URL if provided via command line
+    if args.openai_base_url:
+        os.environ["OPENAI_BASE_URL"] = args.openai_base_url
+
     # Check if ANTHROPIC_API_KEY is set
     if "ANTHROPIC_API_KEY" not in os.environ:
-        print("Error: ANTHROPIC_API_KEY environment variable is not set.")
-        print("Please set it to your Anthropic API key.")
-        sys.exit(1)
+        openai_base_url = os.getenv("OPENAI_BASE_URL", "")
+        base_url_info = f" with base URL {openai_base_url}" if openai_base_url else ""
+        
+        if not args.minimize_stdout_logs:
+            console = Console()
+            console.print(
+                Panel(
+                    f"[bold yellow]Warning: ANTHROPIC_API_KEY environment variable is not set.[/bold yellow]\n"
+                    + f"Using OpenAI{base_url_info} with model {args.openai_model} instead.",
+                    title="[bold yellow]API Key Warning[/bold yellow]",
+                    border_style="yellow",
+                    padding=(1, 2),
+                )
+            )
+        else:
+            logger_for_agent_logs.info(
+                f"Warning: ANTHROPIC_API_KEY environment variable is not set. "
+                f"Using OpenAI{base_url_info} with model {args.openai_model} instead."
+            )
 
     # Initialize console
     console = Console()
@@ -113,11 +145,19 @@ def main():
         )
 
     # Initialize LLM client
-    client = get_client(
-        "anthropic-direct",
-        model_name="claude-3-7-sonnet-20250219",
-        use_caching=True,
-    )
+    if "ANTHROPIC_API_KEY" in os.environ:
+        client = get_client(
+            "anthropic-direct",
+            model_name="claude-3-7-sonnet-20250219",
+            use_caching=True,
+        )
+    else:
+        # Use OpenAI client when Anthropic API key is not available
+        client = get_client(
+            "openai-direct",
+            model_name=args.openai_model,
+            cot_model=False,
+        )
 
     # Initialize workspace manager
     workspace_path = Path(args.workspace).resolve()
