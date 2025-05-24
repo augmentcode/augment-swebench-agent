@@ -1,3 +1,5 @@
+[![CodeQL Advanced](https://github.com/nodoubtz/augment-swebench-agent/actions/workflows/codeql.yml/badge.svg)](https://github.com/nodoubtz/augment-swebench-agent/actions/workflows/codeql.yml)
+
 # Augment Swebench Agent
 
 Welcome to the **Augment Swebench Agent** repository! This project is part of the Dimvy Clothing Brand's initiative to augment and automate workflows using advanced agent-based technologies.
