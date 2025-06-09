@@ -6,21 +6,21 @@ This script provides a command-line interface for interacting with the Agent.
 It instantiates an Agent and prompts the user for input, which is then passed to the Agent.
 """
 
-import os
 import argparse
-from pathlib import Path
-import sys
 import logging
+import os
+import sys
+from pathlib import Path
 
-from rich.console import Console
-from rich.panel import Panel
 from prompt_toolkit import prompt
 from prompt_toolkit.history import InMemoryHistory
+from rich.console import Console
+from rich.panel import Panel
 
-from tools.agent import Agent
-from utils.workspace_manager import WorkspaceManager
-from utils.llm_client import get_client
 from prompts.instruction import INSTRUCTION_PROMPT
+from tools.agent import Agent
+from utils.llm_client import get_client
+from utils.workspace_manager import WorkspaceManager
 
 MAX_OUTPUT_TOKENS_PER_TURN = 32768
 MAX_TURNS = 200
@@ -115,7 +115,7 @@ def main():
     # Initialize LLM client
     client = get_client(
         "anthropic-direct",
-        model_name="claude-3-7-sonnet-20250219",
+        model_name="claude-sonnet-4-20250514",
         use_caching=True,
     )
 

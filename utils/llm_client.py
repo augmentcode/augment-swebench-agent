@@ -1,12 +1,13 @@
 """LLM client for Anthropic models."""
 
 import json
+import logging
 import os
 import random
 import time
 from dataclasses import dataclass
 from typing import Any, Tuple, cast
-from dataclasses_json import DataClassJsonMixin
+
 import anthropic
 import openai
 from anthropic import (
@@ -25,9 +26,13 @@ from anthropic._exceptions import (
     OverloadedError as AnthropicOverloadedError,  # pyright: ignore[reportPrivateImportUsage]
 )
 from anthropic.types import (
-    TextBlock as AnthropicTextBlock,
-    ThinkingBlock as AnthropicThinkingBlock,
     RedactedThinkingBlock as AnthropicRedactedThinkingBlock,
+)
+from anthropic.types import (
+    TextBlock as AnthropicTextBlock,
+)
+from anthropic.types import (
+    ThinkingBlock as AnthropicThinkingBlock,
 )
 from anthropic.types import ToolParam as AnthropicToolParam
 from anthropic.types import (
@@ -41,7 +46,7 @@ from anthropic.types.message_create_params import (
     ToolChoiceToolChoiceAuto,
     ToolChoiceToolChoiceTool,
 )
-
+from dataclasses_json import DataClassJsonMixin
 from openai import (
     APIConnectionError as OpenAI_APIConnectionError,
 )
@@ -54,8 +59,6 @@ from openai import (
 from openai._types import (
     NOT_GIVEN as OpenAI_NOT_GIVEN,  # pyright: ignore[reportPrivateImportUsage]
 )
-
-import logging
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
@@ -170,7 +173,7 @@ class AnthropicDirectClient(LLMClient):
 
     def __init__(
         self,
-        model_name="claude-3-7-sonnet-20250219",
+        model_name="claude-sonnet-4-20250514",
         max_retries=2,
         use_caching=True,
         use_low_qos_server: bool = False,
