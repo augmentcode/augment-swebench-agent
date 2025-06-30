@@ -59,6 +59,7 @@ from openai import (
 from openai._types import (
     NOT_GIVEN as OpenAI_NOT_GIVEN,  # pyright: ignore[reportPrivateImportUsage]
 )
+from langsmith.wrappers import wrap_anthropic, wrap_openai
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
@@ -182,8 +183,8 @@ class AnthropicDirectClient(LLMClient):
         """Initialize the Anthropic first party client."""
         api_key = os.getenv("ANTHROPIC_API_KEY")
         # Disable retries since we are handling retries ourselves.
-        self.client = anthropic.Anthropic(
-            api_key=api_key, max_retries=1, timeout=60 * 5
+        self.client = wrap_anthropic(
+            anthropic.Anthropic(api_key=api_key, max_retries=1, timeout=60 * 5)
         )
         self.model_name = model_name
         self.max_retries = max_retries
@@ -318,9 +319,9 @@ class AnthropicDirectClient(LLMClient):
                 "thinking": {"type": "enabled", "budget_tokens": thinking_tokens}
             }
             temperature = 1
-            assert max_tokens >= 32_000 and thinking_tokens <= 8192, (
-                f"As a heuristic, max tokens {max_tokens} must be >= 32k and thinking tokens {thinking_tokens} must be < 8k"
-            )
+            assert (
+                max_tokens >= 32_000 and thinking_tokens <= 8192
+            ), f"As a heuristic, max tokens {max_tokens} must be >= 32k and thinking tokens {thinking_tokens} must be < 8k"
         else:
             extra_body = None
 
@@ -403,10 +404,7 @@ class OpenAIDirectClient(LLMClient):
     def __init__(self, model_name: str, max_retries=2, cot_model: bool = True):
         """Initialize the OpenAI first party client."""
         api_key = os.getenv("OPENAI_API_KEY")
-        self.client = openai.OpenAI(
-            api_key=api_key,
-            max_retries=1,
-        )
+        self.client = wrap_openai(openai.OpenAI(api_key=api_key, max_retries=1))
         self.model_name = model_name
         self.max_retries = max_retries
         self.cot_model = cot_model

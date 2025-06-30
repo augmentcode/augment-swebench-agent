@@ -55,3 +55,20 @@ coverage.xml
 *.swp
 *.swo
 .DS_Store
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Virtual environment - augment-swebench
+augment-swebench/
+
+# Log files
+*_logs.txt
