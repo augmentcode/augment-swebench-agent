@@ -401,13 +401,20 @@ class AnthropicDirectClient(LLMClient):
 class OpenAIDirectClient(LLMClient):
     """Use OpenAI models via first party API."""
 
-    def __init__(self, model_name: str, max_retries=2, cot_model: bool = True):
+    def __init__(
+        self,
+        model_name: str,
+        max_retries=2,
+        cot_model: bool = True,
+        parallel_tool_calls: bool | None = None,
+    ):
         """Initialize the OpenAI first party client."""
         api_key = os.getenv("OPENAI_API_KEY")
         self.client = wrap_openai(openai.OpenAI(api_key=api_key, max_retries=1))
         self.model_name = model_name
         self.max_retries = max_retries
         self.cot_model = cot_model
+        self.parallel_tool_calls = parallel_tool_calls
 
     def generate(
         self,
@@ -438,7 +445,8 @@ class OpenAIDirectClient(LLMClient):
         openai_messages = []
         if system_prompt is not None:
             if self.cot_model:
-                raise NotImplementedError("System prompt not supported for cot model")
+                pass
+                # raise NotImplementedError("System prompt not supported for cot model")
             system_message = {"role": "system", "content": system_prompt}
             openai_messages.append(system_message)
         for idx, message_list in enumerate(messages):
@@ -460,7 +468,9 @@ class OpenAIDirectClient(LLMClient):
                     "id": augment_message.tool_call_id,
                     "function": {
                         "name": augment_message.tool_name,
-                        "arguments": augment_message.tool_input,
+                        "arguments": str(
+                            augment_message.tool_input
+                        ),  # tool results should be str: https://platform.openai.com/docs/guides/function-calling/parallel-function-calling?api-mode=responses#formatting-results
                     },
                 }
                 openai_message = {
@@ -521,7 +531,6 @@ class OpenAIDirectClient(LLMClient):
                     extra_body["max_completion_tokens"] = max_tokens
                     openai_max_tokens = OpenAI_NOT_GIVEN
                     openai_temperature = OpenAI_NOT_GIVEN
-
                 response = self.client.chat.completions.create(  # type: ignore
                     model=self.model_name,
                     messages=openai_messages,
@@ -530,6 +539,11 @@ class OpenAIDirectClient(LLMClient):
                     tool_choice=tool_choice_param,  # type: ignore
                     max_tokens=openai_max_tokens,
                     extra_body=extra_body,
+                    parallel_tool_calls=(
+                        self.parallel_tool_calls
+                        if self.parallel_tool_calls is not None
+                        else OpenAI_NOT_GIVEN
+                    ),
                 )
                 break
             except (

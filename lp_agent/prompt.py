@@ -39,6 +39,23 @@ Follow these steps to create the landing page:
 5. Create a main page template:
    In src/templates/, create a LandingPage.tsx template that combines all the section components and implements the overall page structure.
 
+6. Use Placeholder Image:
+   Where it makes sense to include an image (e.g., in a hero section, next to a feature description), use the placeholder image located at `/Users/luiscosta/Desktop/tutto/cluster/repos/augment-swebench-agent/lp_agent/placeholder.jpg`. You will need to copy this image to the `public` directory of the application and then you can reference it in your code with a path like `/placeholder.jpg`.
+
+7. 
+   Once the implementation is complete, run the following command to confirm that the app runs:
+   ```
+   npm run dev
+   ```
+   If there are any errors, fix them.
+
+8.
+   If there are no errors, run the following command to check for any build errors:
+   ```
+   npm run build
+   ```
+   If there are any build errors, fix them.
+
 Throughout the development process, adhere to React and TypeScript best practices, use appropriate type definitions, and follow the feature-first architecture while keeping pages, sections, and atoms cleanly separated.
 
 Once you have completed the landing page, provide a summary of your work in the following format:

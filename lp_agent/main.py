@@ -24,7 +24,7 @@ MAX_TURNS = 200
 
 # Define the prompt for the landing page generation
 brand_identity = "color = green"
-brief_path = "lp_agent/data/dose/brief.md"
+brief_path = "data/dose/brief.md"
 with open(brief_path, "r") as file:
     creative_brief = file.read()
 LANDING_PAGE_PROMPT = LP_GENERATION_PROMPT.format(
@@ -32,8 +32,13 @@ LANDING_PAGE_PROMPT = LP_GENERATION_PROMPT.format(
 )
 
 
-def main():
-    """Main entry point for the script."""
+def run_lp_agent(
+    workspace: Path,
+    brand_identity: dict,
+    creative_brief: str,
+    max_turns: int,
+) -> bool:
+    """Run the Landing Page Agent."""
     logs_path = "lp_agent_logs.txt"
     if os.path.exists(logs_path):
         os.remove(logs_path)
@@ -54,16 +59,22 @@ def main():
     logger_for_agent_logs.info("Landing Page Agent started.")
 
     # Initialize LLM client
+    # client = get_client(
+    #     "anthropic-direct",
+    #     # model_name="claude-sonnet-4-20250514",
+    #     model_name="claude-3-5-haiku-latest",
+    #     use_caching=True,
+    # )
+
     client = get_client(
-        "anthropic-direct",
-        model_name="claude-sonnet-4-20250514",
-        use_caching=True,
+        "openai-direct",
+        model_name="gpt-4.1",
+        cot_model=False,
     )
 
     # Initialize workspace manager
-    workspace_path = Path("my-landing").resolve()
     workspace_manager = WorkspaceManager(
-        root=workspace_path,
+        root=workspace,
     )
 
     # Initialize agent
@@ -73,11 +84,13 @@ def main():
         console=console,
         logger_for_agent_logs=logger_for_agent_logs,
         max_output_tokens_per_turn=MAX_OUTPUT_TOKENS_PER_TURN,
-        max_turns=MAX_TURNS,
+        max_turns=max_turns,
         ask_user_permission=False,  # Set to False for non-interactive use
     )
 
-    instruction = LANDING_PAGE_PROMPT
+    instruction = LP_GENERATION_PROMPT.format(
+        brand_identity=brand_identity, creative_brief=creative_brief
+    )
 
     logger_for_agent_logs.info(f"User instruction:\n{instruction}\n-------------")
 
@@ -94,4 +107,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    run_lp_agent(
+        workspace=Path("my-landing").resolve(),
+        brand_identity=brand_identity,
+        creative_brief=creative_brief,
+        max_turns=MAX_TURNS,
+    )

@@ -87,7 +87,9 @@ class ToolError(Exception):
 
 SNIPPET_LINES: int = 4
 
-TRUNCATED_MESSAGE: str = "<response clipped><NOTE>To save on context only part of this file has been shown to you. You should retry this tool after you have searched inside the file with `grep -n` in order to find the line numbers of what you are looking for.</NOTE>"
+TRUNCATED_MESSAGE: str = (
+    "<response clipped><NOTE>To save on context only part of this file has been shown to you. You should retry this tool after you have searched inside the file with `grep -n` in order to find the line numbers of what you are looking for.</NOTE>"
+)
 # original value from Anthropic code
 # MAX_RESPONSE_LEN: int = 16000
 MAX_RESPONSE_LEN: int = 200000
@@ -143,6 +145,7 @@ Custom editing tool for viewing, creating and editing files\n
 * The `create` command cannot be used if the specified `path` already exists as a file\n
 * If a `command` generates a long output, it will be truncated and marked with `<response clipped>` \n
 * The `undo_edit` command will revert the last edit made to the file at `path`\n
+* Prefer this tool over `bash` for codebase exploration\n
 \n
 Notes for using the `str_replace` command:\n
 * The `old_str` parameter should match EXACTLY one or more consecutive lines from the original file. Be mindful of whitespaces!\n
